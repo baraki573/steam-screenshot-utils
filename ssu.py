@@ -22,7 +22,7 @@ Usage:
 
 Notes:
     - Your steam user folder is in Steam/userdata/<user_id>.
-    - Sorting doesn't have an output argument becasue it's done in-place.
+    - Sorting doesn't have an output argument because it's done in-place.
     - For merging, the compressed screenshots folder is expected to be the output of the backup command,
       and the uncompressed screenshots folder is expected to be the output of the sort command.
 
@@ -40,6 +40,7 @@ from docopt import docopt
 
 APPID_CACHE_FILE = "appid_names.json"
 DEFAULT_OUTPUT_FOLDER = "backup"
+ACCESS_TOKEN = ""
 
 
 class AppidConverter:
@@ -59,12 +60,15 @@ class AppidConverter:
         Downloads app data form the Steam API.
         Saves a mapping of appid -> name in a local cache file.
         """
-        r = requests.get("https://api.steampowered.com/ISteamApps/GetAppList/v0002")
+        if len(ACCESS_TOKEN) != 0:
+            r = requests.get(f"https://api.steampowered.com/ISteamApps/GetAppList/v2/?access_token={ACCESS_TOKEN}")
+        else:
+            r = requests.get("https://api.steampowered.com/ISteamApps/GetAppList/v2")
         if r.status_code != 200:
             raise Exception("Error getting app data from Steam API.")
         app_data = r.json()
 
-        appid_names = {str(app['appid']): app['name'] for app in app_data['applist']['apps']}
+        appid_names = {str(app['appid']): sanitize_app_name(app['name']) for app in app_data['applist']['apps']}
         with open(self.cache_file, 'w') as f:
             json.dump(appid_names, f)
 

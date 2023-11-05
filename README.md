@@ -22,6 +22,13 @@ Utilities for sorting, backing up and merging steam screenshots.
   (Useful when you didn't have "Save uncompressed copy" activated at the beginning,
   but activated it at some point afterwards).
 
+# Changes from original
+
+- Saving sanitized app names in the local cache
+- Access the Steam API using an access token
+  
+  It can be retrieved by following this guide: https://steamapi.xpaw.me/
+
 # Usage
 
 ```
